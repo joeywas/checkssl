@@ -32,13 +32,14 @@
 # 2016-08-02 remove spaces from domain names (1.03)
 # 2016-08-22 (joeywas) shortened the data in the "cert issued for" column for easier reading when content is emailed
 # 2016-08-22 (joeywas) changed logic so wildcard certs were not considered a problem
+# 2016-08-22 (joeywas) update logic checks for updates in joeywas branch
 # ---------------------------------------------------------------------------
 
 PROGNAME=${0##*/}
-VERSION="1.03"
+VERSION="1.03.1"
 
 ORIGCMD="$0 $*"
-UPDATE_LOCATION="https://raw.githubusercontent.com/srvrco/checkssl/master/checkssl"
+UPDATE_LOCATION="https://raw.githubusercontent.com/joeywas/checkssl/master/checkssl"
 RENEW_ALERT="30" # set to number of days to be alerted for certificate renewal ( default, can be changed with -expires argument)
 _QUIET=0
 _UPGRADE=0
