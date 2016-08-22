@@ -30,6 +30,8 @@
 # 2016-05-30 Correcting typo (1.01)
 # 2016-07-20 adding -p option to list possible issues (1.02)
 # 2016-08-02 remove spaces from domain names (1.03)
+# 2016-08-22 (joeywas) shortened the data in the "cert issued for" column for easier reading when content is emailed
+# 2016-08-22 (joeywas) changed logic so wildcard certs were not considered a problem
 # ---------------------------------------------------------------------------
 
 PROGNAME=${0##*/}
@@ -279,7 +281,7 @@ while IFS= read -r DOMAIN; do
     PROBLEMS=""
     debug " --------------- domain ${DOMAIN}  ---------------------"
     CERTINFO=$(echo | openssl s_client -servername "${DOMAIN}" -connect "${DOMAIN}:443" 2>/dev/null | openssl x509 2>/dev/null)
-    ISSUEDTO=$(echo "$CERTINFO" | openssl x509 -noout -subject 2>/dev/null|cut -d= -f 3-)
+    ISSUEDTO=$(echo "$CERTINFO" | openssl x509 -noout -subject 2>/dev/null|rev|cut -d= -f 1|rev)
     [[ -z $ISSUEDTO ]] && ISSUEDTO="-"
     debug "$ISSUEDTO"
     ISSUER=$(echo "$CERTINFO" | openssl x509 -noout -issuer 2>/dev/null| grep -Eo "/CN=[a-zA-Z' 0-9]*"| cut -c 5-)
@@ -297,7 +299,11 @@ while IFS= read -r DOMAIN; do
         if [[ "$(echo "$ALT_NAMES" | grep "^${DOMAIN}")" == "${DOMAIN}" ]]; then
           ISSUEDTO="${DOMAIN} (alt)"
         else
-          PROBLEMS="${PROBLEMS}- possible name mismatch"
+	  if echo x"$ISSUEDTO" | grep '*.' > /dev/null ; then
+             ISSUEDTO="${DOMAIN} (wildcard)"
+          else
+             PROBLEMS="${PROBLEMS}- possible name mismatch"
+          fi
         fi
       fi
     fi
